@@ -142,6 +142,8 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--ink);transiti
 .cart-total-val{font-size:24px;font-weight:800;color:var(--ink);font-family:var(--font-head)}
 .btn-checkout{width:100%;padding:15px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font-head);display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
 .btn-checkout:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(37,211,102,.4)}
+.btn-excel{width:100%;padding:13px;background:var(--surface2);color:#1d6f42;border:1.5px solid #1d6f42;border-radius:var(--radius-sm);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-head);display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;margin-top:10px}
+.btn-excel:hover{background:#1d6f42;color:#fff}
 .btn-clear{width:100%;padding:10px;background:transparent;color:var(--ink3);border:none;font-size:12px;cursor:pointer;margin-top:8px;font-family:var(--font-body)}
 .btn-clear:hover{color:var(--red)}
 .toast-wrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:3000;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
@@ -478,10 +480,46 @@ function renderCart(){
       <span class="cart-total-val">${fmt(total)}</span>
     </div>
     <button class="btn-checkout" onclick="sendWA()"><span style="font-size:20px">💬</span> Enviar pedido por WhatsApp</button>
+    <button class="btn-excel" onclick="descargarExcel()">📥 Descargar Excel</button>
     <button class="btn-clear" onclick="clearCart()">Vaciar carrito</button>`;
 }
 
 function clearCart(){CARRITO=[];updateBadge();renderCart();}
+
+function descargarExcel(){
+  if(!CARRITO.length)return;
+  const lista=SESSION?.lista||'Mayoreo';
+  const fecha=new Date().toLocaleString('es-MX');
+  const cliente=SESSION?.nombre||'Invitado';
+  const empresa=SESSION?.empresa||'';
+
+  // Build CSV content
+  let csv='SEP=,\n';
+  csv+=`Pedido MTLider\n`;
+  csv+=`Cliente:,${cliente}${empresa?' ('+empresa+')':''}\n`;
+  csv+=`Lista:,${lista}\n`;
+  csv+=`Fecha:,${fecha}\n`;
+  csv+=`\n`;
+  csv+=`SKU,Nombre,Cantidad,Precio Unitario,Subtotal\n`;
+  CARRITO.forEach(it=>{
+    csv+=`${it.sku},"${it.nombre}",${it.qty},${it.precio.toFixed(2)},${(it.precio*it.qty).toFixed(2)}\n`;
+  });
+  csv+=`\n`;
+  const total=CARRITO.reduce((s,x)=>s+x.precio*x.qty,0);
+  csv+=`,,,,\n`;
+  csv+=`TOTAL:,,,,${total.toFixed(2)}\n`;
+
+  // Download
+  const BOM='\uFEFF'; // UTF-8 BOM para que Excel abra bien
+  const blob=new Blob([BOM+csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`Pedido_MTLider_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('✓ Excel descargado','success');
+}
 
 function sendWA(){
   if(!CARRITO.length)return;
