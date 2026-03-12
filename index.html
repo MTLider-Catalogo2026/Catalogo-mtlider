@@ -375,18 +375,19 @@ function renderCats(){
     const ob=ALL_CATS.find(x=>x.nombre===b)?.orden||99;
     return oa-ob;
   });
-  let h=`<div class="cat-chip active" onclick="setCat('todas',this)">🏷 Todos (${ALL_PRODS.length})</div>`;
-  cats.forEach(c=>{
+  let h=`<div class="cat-chip active" id="chip-todas" onclick="setCat('todas','chip-todas')">🏷 Todos (${ALL_PRODS.length})</div>`;
+  cats.forEach((c,i)=>{
     const count=ALL_PRODS.filter(p=>p.categoria===c).length;
-    h+=`<div class="cat-chip" onclick="setCat(${JSON.stringify(c)},this)">${catMap[c]||'📦'} ${c} (${count})</div>`;
+    const chipId=`chip-${i}`;
+    h+=`<div class="cat-chip" id="${chipId}" onclick="setCat(${JSON.stringify(c)},'${chipId}')">${catMap[c]||'📦'} ${c} (${count})</div>`;
   });
   document.getElementById('cats-list').innerHTML=h;
 }
 
-function setCat(cat,el){
+function setCat(cat,chipId){
   CAT=cat;
   document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('active'));
-  el.classList.add('active');
+  document.getElementById(chipId)?.classList.add('active');
   renderGrid();
 }
 
@@ -682,7 +683,7 @@ function descargarExcel(){
   csv+=`SKU Categoria,SKU Modelo,Nombre,Cantidad,Precio Unitario,Subtotal\n`;
   CARRITO.forEach(it=>{
     const skuCat = it.sku_cat || it.sku.split('/')[0];
-    const skuMod = it.sku_modelo || '';
+    const skuMod = it.sku_modelo || it.sku_cat ? (it.sku !== it.sku_cat ? it.sku : '') : '';
     csv+=`${skuCat},${skuMod},"${it.nombre}",${it.qty},${it.precio.toFixed(2)},${(it.precio*it.qty).toFixed(2)}\n`;
   });
   csv+=`\n,,,,,\nTOTAL:,,,,,${total.toFixed(2)}\n`;
