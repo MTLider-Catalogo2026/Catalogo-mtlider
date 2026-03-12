@@ -625,21 +625,27 @@ async function cargarCarritoGuardado(){
     // 1. Intentar cargar desde servidor primero
     try{
       const r=await call('getCarrito',{usuario:SESSION.usuario});
-      if(r.ok && r.items && r.items.length){
-        // Recalcular precios según lista actual
-        CARRITO=r.items.map(it=>{
-          const prod=ALL_PRODS.find(p=>p.sku===it.sku_cat);
-          if(prod){
-            const vari=it.sku_modelo?ALL_VARIANTES.find(v=>v.sku_modelo===it.sku):null;
-            return {...it, precio:getPrecio(prod,vari?.precio_especial||0)};
-          }
-          return it;
-        });
-        // Sincronizar local con servidor
-        localStorage.setItem('cart_'+SESSION.usuario, JSON.stringify(CARRITO));
-        updateBadge();
-        const totalPiezas=CARRITO.reduce((s,x)=>s+x.qty,0);
-        if(totalPiezas>0) setTimeout(()=>toast(`🛒 Carrito recuperado: ${totalPiezas} pieza(s)`,'success'),800);
+      if(r.ok){
+        if(r.items && r.items.length){
+          // Recalcular precios según lista actual
+          CARRITO=r.items.map(it=>{
+            const prod=ALL_PRODS.find(p=>p.sku===it.sku_cat);
+            if(prod){
+              const vari=it.sku_modelo?ALL_VARIANTES.find(v=>v.sku_modelo===it.sku):null;
+              return {...it, precio:getPrecio(prod,vari?.precio_especial||0)};
+            }
+            return it;
+          });
+          localStorage.setItem('cart_'+SESSION.usuario, JSON.stringify(CARRITO));
+          updateBadge();
+          const totalPiezas=CARRITO.reduce((s,x)=>s+x.qty,0);
+          if(totalPiezas>0) setTimeout(()=>toast(`🛒 Carrito recuperado: ${totalPiezas} pieza(s)`,'success'),800);
+        } else {
+          // Servidor confirmó carrito vacío — limpiar localStorage también
+          localStorage.removeItem('cart_'+SESSION.usuario);
+          CARRITO=[];
+          updateBadge();
+        }
         return;
       }
     } catch(e){}
