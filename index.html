@@ -183,7 +183,44 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--ink);transiti
 .loading-screen.show{display:flex}
 .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-/* CONFIRM MODAL */
+/* BIENVENIDA */
+.bienvenida-overlay{display:none;position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:24px;animation:fadeIn .4s ease}
+.bienvenida-overlay.open{display:flex}
+.bienvenida-box{background:var(--surface);border-radius:24px;padding:36px 28px;width:100%;max-width:420px;text-align:center;box-shadow:var(--shadow-lg);animation:slideUp .4s ease}
+.bienvenida-logo{font-size:52px;margin-bottom:12px}
+.bienvenida-titulo{font-family:var(--font-head);font-size:22px;font-weight:900;color:var(--primary);margin-bottom:6px}
+.bienvenida-subtitulo{font-size:15px;color:var(--ink);font-weight:600;margin-bottom:10px}
+.bienvenida-msg{font-size:13px;color:var(--ink2);line-height:1.7;margin-bottom:24px}
+.bienvenida-btn{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;border:none;border-radius:var(--radius-sm);padding:12px 32px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-head)}
+
+/* ADMIN */
+.screen-admin{display:none;min-height:100vh;background:var(--bg);flex-direction:column}
+.screen-admin.active{display:flex}
+.admin-topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.admin-topbar-left{display:flex;align-items:center;gap:12px}
+.admin-topbar-title{font-family:var(--font-head);font-size:18px;font-weight:900;color:var(--primary)}
+.admin-topbar-sub{font-size:12px;color:var(--ink3)}
+.admin-body{padding:20px;max-width:900px;width:100%;margin:0 auto}
+.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.admin-count{font-family:var(--font-head);font-size:15px;font-weight:700;color:var(--ink)}
+.admin-refresh{background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-head);display:flex;align-items:center;gap:6px}
+.admin-loading{display:none;align-items:center;justify-content:center;padding:60px;gap:12px;color:var(--ink3);font-size:14px}
+.admin-empty{text-align:center;padding:60px;color:var(--ink3);font-size:15px}
+.admin-grid{display:flex;flex-direction:column;gap:16px}
+.admin-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow)}
+.admin-card-header{display:flex;align-items:flex-start;justify-content:space-between;padding:16px 20px;background:linear-gradient(135deg,rgba(0,102,204,.06),rgba(0,200,83,.06));border-bottom:1px solid var(--border)}
+.admin-card-nombre{font-family:var(--font-head);font-size:16px;font-weight:800;color:var(--ink);margin-bottom:4px}
+.admin-card-meta{font-size:12px;color:var(--ink3)}
+.admin-card-total{font-family:var(--font-head);font-size:20px;font-weight:900;color:var(--accent);white-space:nowrap}
+.admin-items{padding:12px 20px;display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto}
+.admin-item{background:var(--surface2);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.admin-item-nombre{font-size:13px;font-weight:700;color:var(--ink)}
+.admin-item-detalle{font-size:11px;color:var(--ink3)}
+.admin-item-sub{font-size:12px;color:var(--ink2)}
+.admin-card-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--border);flex-wrap:wrap;gap:8px}
+.admin-piezas{font-size:12px;color:var(--ink3)}
+.admin-btn-wa{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;font-family:var(--font-head)}
+
 .confirm-overlay{display:none;position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px}
 .confirm-overlay.open{display:flex}
 .confirm-box{background:var(--surface);border-radius:20px;padding:32px 28px;width:100%;max-width:400px;box-shadow:var(--shadow-lg);animation:slideUp .3s ease;text-align:center}
@@ -274,7 +311,44 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--ink);transiti
 
 <div class="toast-wrap" id="toast-wrap"></div>
 
-<!-- CONFIRM ENVIO -->
+<!-- BIENVENIDA -->
+<div class="bienvenida-overlay" id="bienvenida-overlay">
+  <div class="bienvenida-box">
+    <div class="bienvenida-logo">🎉</div>
+    <div class="bienvenida-titulo">¡Bienvenido al Catálogo MTLider!</div>
+    <div class="bienvenida-subtitulo" id="bienvenida-nombre"></div>
+    <div class="bienvenida-msg">Nos da mucho gusto tenerte aquí.<br>Explora todos nuestros productos y encuentra lo que necesitas.<br><br>💬 Recuerda que cualquier duda puedes hablar con tu vendedor.</div>
+    <button class="bienvenida-btn" onclick="document.getElementById('bienvenida-overlay').classList.remove('open')">¡Empezar a explorar! 🛍️</button>
+  </div>
+</div>
+
+<!-- PANEL ADMIN -->
+<div class="screen-admin" id="screen-admin">
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <div>
+        <div class="admin-topbar-title">📊 Panel Admin — MTLider</div>
+        <div class="admin-topbar-sub">Carritos activos de clientes</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:13px;color:var(--ink3)" id="admin-user"></span>
+      <button class="admin-refresh" onclick="cargarCarritosAdmin()">🔄 Actualizar</button>
+      <button onclick="doLogout()" style="background:transparent;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:7px 14px;font-size:12px;cursor:pointer;color:var(--ink3)">Salir</button>
+    </div>
+  </div>
+  <div class="admin-body">
+    <div class="admin-header">
+      <span class="admin-count" id="admin-count"></span>
+    </div>
+    <div class="admin-loading" id="admin-loading">
+      <div class="spinner"></div> Cargando carritos...
+    </div>
+    <div class="admin-grid" id="admin-grid"></div>
+  </div>
+</div>
+
+
 <div class="confirm-overlay" id="confirm-overlay">
   <div class="confirm-box">
     <div class="confirm-icon">📋</div>
@@ -390,15 +464,20 @@ async function doLogin(){
   const r=await call('login',{usuario:u,password:p});
   document.getElementById('loading').classList.remove('show');
   if(r.ok){
-    SESSION={nombre:r.nombre,empresa:r.empresa,lista:r.lista,wa:r.whatsapp_vendedor,usuario:u};
+    SESSION={nombre:r.nombre,empresa:r.empresa,lista:r.lista,wa:r.whatsapp_vendedor,usuario:u,rol:r.rol||'cliente'};
     localStorage.setItem('cat_session',JSON.stringify(SESSION));
-    mostrarApp();
-    cargarCarritoGuardado();
+    if(SESSION.rol==='admin'){
+      mostrarAdmin();
+    } else {
+      mostrarBienvenida();
+      mostrarApp();
+      cargarCarritoGuardado();
+    }
   } else setErr(r.error||'Usuario o contraseña incorrectos');
 }
 
 function entrarInvitado(){
-  SESSION={nombre:'Invitado',empresa:'',lista:'Menudeo',wa:CONFIG.negocio_whatsapp,usuario:'invitado'};
+  SESSION={nombre:'Invitado',empresa:'',lista:'Menudeo',wa:CONFIG.negocio_whatsapp,usuario:'invitado',rol:'cliente'};
   mostrarApp();
 }
 
@@ -408,11 +487,24 @@ function doLogout(){
   SESSION=null;CARRITO=[];
   localStorage.removeItem('cat_session');
   document.getElementById('screen-app').classList.remove('active');
+  document.getElementById('screen-admin').classList.remove('active');
   document.getElementById('screen-login').classList.remove('hidden');
   document.getElementById('screen-login').classList.add('active');
 }
 
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('screen-login').classList.contains('active'))doLogin();});
+
+// ── BIENVENIDA ────────────────────────────────────────────────────────────────
+function mostrarBienvenida(){
+  if(SESSION.usuario==='invitado') return;
+  const hoy=new Date().toDateString();
+  const key='bienvenida_'+SESSION.usuario+'_'+hoy;
+  if(localStorage.getItem(key)) return;
+  localStorage.setItem(key,'1');
+  document.getElementById('bienvenida-nombre').textContent=SESSION.nombre;
+  document.getElementById('bienvenida-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('bienvenida-overlay').classList.remove('open'),6000);
+}
 
 // ── APP ───────────────────────────────────────────────────────────────────────
 function mostrarApp(){
@@ -423,6 +515,55 @@ function mostrarApp(){
   document.getElementById('tb-lista').textContent=SESSION.lista;
   renderCats();renderGrid();
 }
+
+// ── ADMIN ─────────────────────────────────────────────────────────────────────
+async function mostrarAdmin(){
+  document.getElementById('screen-login').classList.remove('active');
+  document.getElementById('screen-login').classList.add('hidden');
+  document.getElementById('screen-admin').classList.add('active');
+  document.getElementById('admin-user').textContent=SESSION.nombre;
+  await cargarCarritosAdmin();
+}
+
+async function cargarCarritosAdmin(){
+  document.getElementById('admin-loading').style.display='flex';
+  document.getElementById('admin-grid').innerHTML='';
+  const r=await call('getCarritosAdmin');
+  document.getElementById('admin-loading').style.display='none';
+  if(!r.ok||!r.carritos.length){
+    document.getElementById('admin-grid').innerHTML='<div class="admin-empty">📭 No hay carritos activos en este momento</div>';
+    return;
+  }
+  document.getElementById('admin-count').textContent=r.carritos.length+' carrito(s) activo(s)';
+  r.carritos.forEach(c=>{
+    const itemsHtml=c.items.map(it=>`
+      <div class="admin-item">
+        <span class="admin-item-nombre">${it.nombre}</span>
+        <span class="admin-item-detalle">SKU: ${it.sku} | Cant: ${it.qty} | ${fmt2(it.precio)} c/u</span>
+        <span class="admin-item-sub">Subtotal: <strong>${fmt2(it.subtotal)}</strong></span>
+      </div>`).join('');
+    const vendedorWA=c.vendedor?`<a class="admin-btn-wa" href="https://wa.me/${c.vendedor.replace(/\D/g,'')}?text=${encodeURIComponent('Hola, el cliente '+c.nombre+(c.empresa?' ('+c.empresa+')':'')+' tiene un carrito pendiente por '+fmt2(c.total)+'. ¿Puedes darle seguimiento?')}" target="_blank">💬 Contactar vendedor</a>`:'';
+    const div=document.createElement('div');
+    div.className='admin-card';
+    div.innerHTML=`
+      <div class="admin-card-header">
+        <div>
+          <div class="admin-card-nombre">👤 ${c.nombre}${c.empresa?' — '+c.empresa:''}</div>
+          <div class="admin-card-meta">📋 Lista: ${c.lista} ${c.vendedor?'| 👨‍💼 Vendedor: '+c.vendedor:''}</div>
+        </div>
+        <div class="admin-card-total">${fmt2(c.total)}</div>
+      </div>
+      <div class="admin-items">${itemsHtml}</div>
+      <div class="admin-card-footer">
+        <span class="admin-piezas">${c.items.reduce((s,i)=>s+i.qty,0)} piezas · ${c.items.length} producto(s)</span>
+        ${vendedorWA}
+      </div>`;
+    document.getElementById('admin-grid').appendChild(div);
+  });
+}
+
+function fmt2(n){return'$'+Number(n).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});}
+
 
 function getPrecio(p,precioEsp=null){
   if(precioEsp && Number(precioEsp)>0) return Number(precioEsp);
