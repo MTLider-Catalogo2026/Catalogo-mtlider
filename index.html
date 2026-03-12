@@ -509,7 +509,15 @@ function addVariantesModal(sku){
       const itemSku=v.sku_modelo || `${sku}/${v.modelo}`;
       const ex=CARRITO.find(x=>x.sku===itemSku);
       if(ex) ex.qty+=qty;
-      else CARRITO.push({sku:itemSku,nombre:`${p.nombre} - ${v.modelo}`,foto:p.foto1||'',precio,qty});
+      else CARRITO.push({
+        sku: itemSku,
+        sku_cat: sku,
+        sku_modelo: v.sku_modelo || '',
+        nombre: `${p.nombre} - ${v.modelo}`,
+        foto: p.foto1||'',
+        precio,
+        qty
+      });
       agregados++;
     }
   });
@@ -539,7 +547,7 @@ function addCart(sku,qty){
   const agotado=(p.stock===0)||(p.etiqueta||'').toLowerCase()==='agotado';
   if(agotado) return;
   const ex=CARRITO.find(x=>x.sku===sku);
-  if(ex) ex.qty+=qty; else CARRITO.push({sku,nombre:p.nombre,foto:p.foto1||'',precio:getPrecio(p),qty});
+  if(ex) ex.qty+=qty; else CARRITO.push({sku, sku_cat:sku, sku_modelo:'', nombre:p.nombre, foto:p.foto1||'', precio:getPrecio(p), qty});
   saveCarrito();updateBadge();toast('✓ '+p.nombre+' agregado','success');
 }
 
@@ -641,8 +649,10 @@ function sendWA(){
   msg+=`📋 Lista: *${lista}*\n`;
   msg+=`─────────────────\n`;
   CARRITO.forEach(it=>{
+    const skuCat = it.sku_cat || it.sku;
+    const skuMod = it.sku_modelo ? ` / ${it.sku_modelo}` : '';
     msg+=`• *${it.nombre}*\n`;
-    msg+=`  SKU: ${it.sku}  |  Cant: ${it.qty}  |  ${fmt(it.precio)} c/u\n`;
+    msg+=`  SKU: ${skuCat}${skuMod}  |  Cant: ${it.qty}  |  ${fmt(it.precio)} c/u\n`;
     msg+=`  Subtotal: *${fmt(it.precio*it.qty)}*\n`;
   });
   msg+=`─────────────────\n`;
@@ -664,11 +674,13 @@ function descargarExcel(){
   csv+=`Cliente:,${cliente}${empresa?' ('+empresa+')':''}\n`;
   csv+=`Lista:,${lista}\n`;
   csv+=`Fecha:,${fecha}\n\n`;
-  csv+=`SKU,Nombre,Cantidad,Precio Unitario,Subtotal\n`;
+  csv+=`SKU Categoría,SKU Modelo,Nombre,Cantidad,Precio Unitario,Subtotal\n`;
   CARRITO.forEach(it=>{
-    csv+=`${it.sku},"${it.nombre}",${it.qty},${it.precio.toFixed(2)},${(it.precio*it.qty).toFixed(2)}\n`;
+    const skuCat = it.sku_cat || it.sku;
+    const skuMod = it.sku_modelo || '—';
+    csv+=`${skuCat},${skuMod},"${it.nombre}",${it.qty},${it.precio.toFixed(2)},${(it.precio*it.qty).toFixed(2)}\n`;
   });
-  csv+=`\n,,,,\nTOTAL:,,,,${total.toFixed(2)}\n`;
+  csv+=`\n,,,,,\nTOTAL:,,,,,${total.toFixed(2)}\n`;
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
