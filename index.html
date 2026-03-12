@@ -273,14 +273,24 @@ async function init(){
   if(localStorage.getItem('cat_dark')==='true'){DARK=true;document.body.classList.add('dark');document.getElementById('dark-btn').textContent='☀️';}
   const saved=localStorage.getItem('cat_session');
   if(saved) SESSION=JSON.parse(saved);
-  await Promise.all([loadConfig(),loadProds(),loadCats(),loadVariantes()]);
+  try{
+    await Promise.all([loadConfig(),loadProds(),loadCats(),loadVariantes()]);
+  } catch(e){
+    console.error('Error cargando datos:',e);
+  }
   document.getElementById('loading').classList.remove('show');
   if(SESSION){cargarCarritoGuardado();mostrarApp();}
   else document.getElementById('screen-login').classList.add('active');
 }
 
 async function call(action,params={}){
-  try{const r=await fetch(API+'?'+new URLSearchParams({action,...params}));return await r.json();}
+  try{
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),10000);
+    const r=await fetch(API+'?'+new URLSearchParams({action,...params}),{signal:controller.signal});
+    clearTimeout(timer);
+    return await r.json();
+  }
   catch(e){return{ok:false,error:e.message};}
 }
 
