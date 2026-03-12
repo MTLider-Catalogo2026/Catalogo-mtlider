@@ -560,14 +560,19 @@ function saveCarrito(){
 }
 
 function cargarCarritoGuardado(){
-  // Siempre limpiar primero — cada usuario tiene su propio carrito
   CARRITO=[];
   updateBadge();
   if(SESSION?.usuario && SESSION.usuario!=='invitado'){
     const saved=localStorage.getItem('cart_'+SESSION.usuario);
     if(saved){
       try{
-        CARRITO=JSON.parse(saved);
+        const items=JSON.parse(saved);
+        // Sanitizar items del carrito — limpiar formato viejo
+        CARRITO=items.map(it=>({
+          ...it,
+          sku_cat: it.sku_cat || it.sku.split('/')[0],
+          sku_modelo: it.sku_modelo || ''
+        }));
         updateBadge();
         if(CARRITO.length){
           const totalPiezas=CARRITO.reduce((s,x)=>s+x.qty,0);
@@ -681,6 +686,8 @@ function descargarExcel(){
     csv+=`${skuCat},${skuMod},"${it.nombre}",${it.qty},${it.precio.toFixed(2)},${(it.precio*it.qty).toFixed(2)}\n`;
   });
   csv+=`\n,,,,,\nTOTAL:,,,,,${total.toFixed(2)}\n`;
+
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
