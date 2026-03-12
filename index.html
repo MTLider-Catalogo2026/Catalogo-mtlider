@@ -761,16 +761,16 @@ function clearCart(){
 
 function abrirConfirm(){
   if(!CARRITO.length) return;
-  cerrarCarrito();
-  setTimeout(()=>document.getElementById('confirm-overlay').classList.add('open'),300);
+  // Cerrar carrito y abrir modal inmediatamente sin delay
+  document.getElementById('cart-overlay').classList.remove('open');
+  document.getElementById('cart-panel').classList.remove('open');
+  document.getElementById('confirm-overlay').classList.add('open');
 }
 
 function confirmarEnvio(){
   document.getElementById('confirm-overlay').classList.remove('open');
-  // Descargar Excel primero
   descargarExcel();
-  // Enviar WhatsApp después de un momento
-  setTimeout(()=>sendWA(),600);
+  sendWA();
 }
 
 function sendWA(){
