@@ -264,7 +264,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--ink);transiti
 <div class="toast-wrap" id="toast-wrap"></div>
 
 <script>
-const API='https://script.google.com/macros/s/AKfycbytqkBvD9IrJ0fxv57kz9hdAIl4K0To60xCKiPOwqyg687RK8rDkp5gCGHNDjABpiQu/exec';
+const API='https://script.google.com/macros/s/AKfycbym_sDa3bxs-WPYza1QuNvPY4qwdODzAJ_h1iPZ8BfZgwRLEc7ctjpXzA8EB19WGtQ/exec';
 
 let SESSION=null,CONFIG={},ALL_PRODS=[],ALL_CATS=[],ALL_VARIANTES=[],CARRITO=[],CAT='todas',Q='',DARK=false;
 
@@ -608,43 +608,59 @@ function addCart(sku,qty){
 
 function saveCarrito(){
   if(SESSION?.usuario && SESSION.usuario!=='invitado'){
+    // Guardar local siempre (instantáneo)
     localStorage.setItem('cart_'+SESSION.usuario, JSON.stringify(CARRITO));
+    // Guardar en servidor en segundo plano (silencioso)
+    const items=JSON.stringify(CARRITO);
+    call('saveCarrito',{usuario:SESSION.usuario, items}).catch(()=>{});
     document.getElementById('cart-saved-tag').style.display='flex';
     setTimeout(()=>document.getElementById('cart-saved-tag').style.display='none',2000);
   }
 }
 
-function cargarCarritoGuardado(){
+async function cargarCarritoGuardado(){
   CARRITO=[];
   updateBadge();
   if(SESSION?.usuario && SESSION.usuario!=='invitado'){
+    // 1. Intentar cargar desde servidor primero
+    try{
+      const r=await call('getCarrito',{usuario:SESSION.usuario});
+      if(r.ok && r.items && r.items.length){
+        // Recalcular precios según lista actual
+        CARRITO=r.items.map(it=>{
+          const prod=ALL_PRODS.find(p=>p.sku===it.sku_cat);
+          if(prod){
+            const vari=it.sku_modelo?ALL_VARIANTES.find(v=>v.sku_modelo===it.sku):null;
+            return {...it, precio:getPrecio(prod,vari?.precio_especial||0)};
+          }
+          return it;
+        });
+        // Sincronizar local con servidor
+        localStorage.setItem('cart_'+SESSION.usuario, JSON.stringify(CARRITO));
+        updateBadge();
+        const totalPiezas=CARRITO.reduce((s,x)=>s+x.qty,0);
+        if(totalPiezas>0) setTimeout(()=>toast(`🛒 Carrito recuperado: ${totalPiezas} pieza(s)`,'success'),800);
+        return;
+      }
+    } catch(e){}
+
+    // 2. Fallback a localStorage si servidor falla
     const saved=localStorage.getItem('cart_'+SESSION.usuario);
     if(saved){
       try{
         const items=JSON.parse(saved);
         CARRITO=items.map(it=>{
-          // Sanitizar SKUs
-          const sku_cat = it.sku_cat || it.sku.split('/')[0];
-          const sku_modelo = it.sku_modelo || '';
-          // Recalcular precio según lista actual del cliente
-          let precio = it.precio;
-          if(sku_modelo){
-            // Es variante — buscar producto base y precio especial
-            const prod=ALL_PRODS.find(p=>p.sku===sku_cat);
-            const vari=ALL_VARIANTES.find(v=>v.sku_modelo===it.sku);
-            if(prod) precio=getPrecio(prod, vari?.precio_especial||0);
-          } else {
-            // Producto normal
-            const prod=ALL_PRODS.find(p=>p.sku===it.sku);
-            if(prod) precio=getPrecio(prod);
+          const sku_cat=it.sku_cat||it.sku.split('/')[0];
+          const prod=ALL_PRODS.find(p=>p.sku===sku_cat);
+          if(prod){
+            const vari=it.sku_modelo?ALL_VARIANTES.find(v=>v.sku_modelo===it.sku):null;
+            return {...it, sku_cat, sku_modelo:it.sku_modelo||'', precio:getPrecio(prod,vari?.precio_especial||0)};
           }
-          return {...it, sku_cat, sku_modelo, precio};
+          return {...it, sku_cat, sku_modelo:it.sku_modelo||''};
         });
         updateBadge();
-        if(CARRITO.length){
-          const totalPiezas=CARRITO.reduce((s,x)=>s+x.qty,0);
-          setTimeout(()=>toast(`🛒 Carrito recuperado: ${totalPiezas} pieza(s) de ${CARRITO.length} producto(s)`,'success'),800);
-        }
+        const totalPiezas=CARRITO.reduce((s,x)=>s+x.qty,0);
+        if(totalPiezas>0) setTimeout(()=>toast(`🛒 Carrito local: ${totalPiezas} pieza(s)`,'success'),800);
       } catch(e){ CARRITO=[]; }
     }
   }
@@ -706,7 +722,10 @@ function renderCart(){
 
 function clearCart(){
   CARRITO=[];
-  if(SESSION?.usuario && SESSION.usuario!=='invitado') localStorage.removeItem('cart_'+SESSION.usuario);
+  if(SESSION?.usuario && SESSION.usuario!=='invitado'){
+    localStorage.removeItem('cart_'+SESSION.usuario);
+    call('clearCarrito',{usuario:SESSION.usuario}).catch(()=>{});
+  }
   updateBadge();renderCart();
 }
 
@@ -732,6 +751,8 @@ function sendWA(){
   msg+=`📅 ${new Date().toLocaleString('es-MX')}`;
   const num=(SESSION?.wa||CONFIG.negocio_whatsapp||'').replace(/\D/g,'');
   window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`,'_blank');
+  // Limpiar carrito después de enviar
+  setTimeout(()=>clearCart(),1000);
 }
 
 function descargarExcel(){
