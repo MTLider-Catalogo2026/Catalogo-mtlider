@@ -506,7 +506,7 @@ function addVariantesModal(sku){
     const qty=parseInt(document.getElementById('vqty_'+i)?.value)||0;
     if(qty>0 && v.stock!==0){
       const precio=getPrecio(p,v.precio_especial);
-      const itemSku=`${sku}/${v.modelo}`;
+      const itemSku=v.sku_modelo || `${sku}/${v.modelo}`;
       const ex=CARRITO.find(x=>x.sku===itemSku);
       if(ex) ex.qty+=qty;
       else CARRITO.push({sku:itemSku,nombre:`${p.nombre} - ${v.modelo}`,foto:p.foto1||'',precio,qty});
