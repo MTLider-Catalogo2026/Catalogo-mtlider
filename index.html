@@ -273,14 +273,49 @@ async function init(){
   if(localStorage.getItem('cat_dark')==='true'){DARK=true;document.body.classList.add('dark');document.getElementById('dark-btn').textContent='☀️';}
   const saved=localStorage.getItem('cat_session');
   if(saved) SESSION=JSON.parse(saved);
+
+  // Cargar caché local primero para arranque instantáneo
+  const cachedProds=localStorage.getItem('cache_productos');
+  const cachedCats=localStorage.getItem('cache_categorias');
+  const cachedVars=localStorage.getItem('cache_variantes');
+  const cachedCfg=localStorage.getItem('cache_config');
+  if(cachedProds) ALL_PRODS=JSON.parse(cachedProds);
+  if(cachedCats)  ALL_CATS=JSON.parse(cachedCats);
+  if(cachedVars)  ALL_VARIANTES=JSON.parse(cachedVars);
+  if(cachedCfg){  CONFIG=JSON.parse(cachedCfg); applyConfig(); }
+
+  // Si hay caché, mostrar app de inmediato
+  if(cachedProds){
+    document.getElementById('loading').classList.remove('show');
+    if(SESSION){cargarCarritoGuardado();mostrarApp();}
+    else document.getElementById('screen-login').classList.add('active');
+  }
+
+  // Actualizar datos en segundo plano
   try{
     await Promise.all([loadConfig(),loadProds(),loadCats(),loadVariantes()]);
+    // Guardar en caché
+    localStorage.setItem('cache_productos',JSON.stringify(ALL_PRODS));
+    localStorage.setItem('cache_categorias',JSON.stringify(ALL_CATS));
+    localStorage.setItem('cache_variantes',JSON.stringify(ALL_VARIANTES));
+    localStorage.setItem('cache_config',JSON.stringify(CONFIG));
+    // Si no había caché, mostrar ahora
+    if(!cachedProds){
+      document.getElementById('loading').classList.remove('show');
+      if(SESSION){cargarCarritoGuardado();mostrarApp();}
+      else document.getElementById('screen-login').classList.add('active');
+    } else {
+      // Refrescar grid silenciosamente si ya estaba visible
+      if(SESSION) renderGrid();
+    }
   } catch(e){
-    console.error('Error cargando datos:',e);
+    console.error('Error actualizando datos:',e);
+    if(!cachedProds){
+      document.getElementById('loading').classList.remove('show');
+      if(SESSION){cargarCarritoGuardado();mostrarApp();}
+      else document.getElementById('screen-login').classList.add('active');
+    }
   }
-  document.getElementById('loading').classList.remove('show');
-  if(SESSION){cargarCarritoGuardado();mostrarApp();}
-  else document.getElementById('screen-login').classList.add('active');
 }
 
 async function call(action,params={}){
@@ -663,15 +698,15 @@ function sendWA(){
   let msg=`🛒 *PEDIDO - ${CONFIG.negocio_nombre||'MTLider'}*\n`;
   msg+=`👤 *${SESSION?.nombre||'Invitado'}*${emp}\n`;
   msg+=`📋 Lista: *${lista}*\n`;
-  msg+=`─────────────────\n`;
+  msg+=`━━━━━━━━━━━━━━━━━\n`;
   CARRITO.forEach(it=>{
     const skuCat = it.sku_cat || it.sku.split('/')[0];
     const skuMod = it.sku_modelo ? ` / ${it.sku_modelo}` : '';
-    msg+=`• *${it.nombre}*\n`;
-    msg+=`  SKU: ${skuCat}${skuMod}  |  Cant: ${it.qty}  |  ${fmt(it.precio)} c/u\n`;
+    msg+=`▪ *${it.nombre}*\n`;
+    msg+=`  SKU: ${skuCat}${skuMod} | Cant: ${it.qty} | ${fmt(it.precio)} c/u\n`;
     msg+=`  Subtotal: *${fmt(it.precio*it.qty)}*\n`;
   });
-  msg+=`─────────────────\n`;
+  msg+=`━━━━━━━━━━━━━━━━━\n`;
   msg+=`💰 *TOTAL: ${fmt(total)} ${moneda}*\n`;
   msg+=`📅 ${new Date().toLocaleString('es-MX')}`;
   const num=(SESSION?.wa||CONFIG.negocio_whatsapp||'').replace(/\D/g,'');
