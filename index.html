@@ -275,7 +275,7 @@ async function init(){
   if(saved) SESSION=JSON.parse(saved);
   await Promise.all([loadConfig(),loadProds(),loadCats(),loadVariantes()]);
   document.getElementById('loading').classList.remove('show');
-  if(SESSION){mostrarApp();cargarCarritoGuardado();}
+  if(SESSION){cargarCarritoGuardado();mostrarApp();}
   else document.getElementById('screen-login').classList.add('active');
 }
 
@@ -557,7 +557,10 @@ function cargarCarritoGuardado(){
     if(saved){
       CARRITO=JSON.parse(saved);
       updateBadge();
-      if(CARRITO.length) toast(`🛒 Tienes ${CARRITO.length} producto(s) guardados en tu carrito`,'');
+      if(CARRITO.length){
+        const totalPiezas=CARRITO.reduce((s,x)=>s+x.qty,0);
+        setTimeout(()=>toast(`🛒 Carrito recuperado: ${totalPiezas} pieza(s) de ${CARRITO.length} producto(s)`,'success'),800);
+      }
     }
   }
 }
