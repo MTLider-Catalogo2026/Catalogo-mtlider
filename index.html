@@ -279,9 +279,15 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--ink);transiti
   <div class="confirm-box">
     <div class="confirm-icon">📋</div>
     <div class="confirm-title">Confirmar pedido</div>
-    <div class="confirm-desc">Se enviará el pedido por WhatsApp y se descargará automáticamente el archivo Excel.<br><br>📎 <strong>Recuerda adjuntar el Excel</strong> en el chat de WhatsApp para que tengamos el detalle completo.</div>
+    <div class="confirm-desc">Para completar tu pedido realiza estos 2 pasos:</div>
+    <div style="text-align:left;background:var(--surface2);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:20px;font-size:13px;color:var(--ink2);line-height:1.8">
+      <div>1️⃣ Descarga el Excel con el detalle</div>
+      <div>2️⃣ Envía el pedido por WhatsApp</div>
+      <div style="margin-top:8px;font-size:12px;color:var(--ink3)">📎 Adjunta el Excel en el chat de WhatsApp</div>
+    </div>
     <div class="confirm-btns">
-      <button class="btn-confirm-wa" onclick="confirmarEnvio()">💬 Enviar por WhatsApp + Descargar Excel</button>
+      <button class="btn-excel" style="margin-top:0" onclick="descargarExcel()">📥 Paso 1 — Descargar Excel</button>
+      <button class="btn-confirm-wa" onclick="confirmarEnvio()">💬 Paso 2 — Enviar por WhatsApp</button>
       <button class="btn-confirm-cancel" onclick="document.getElementById('confirm-overlay').classList.remove('open')">Cancelar</button>
     </div>
   </div>
@@ -769,7 +775,6 @@ function abrirConfirm(){
 
 function confirmarEnvio(){
   document.getElementById('confirm-overlay').classList.remove('open');
-  descargarExcel();
   sendWA();
 }
 
