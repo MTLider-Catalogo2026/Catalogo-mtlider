@@ -183,6 +183,17 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--ink);transiti
 .loading-screen.show{display:flex}
 .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+/* CONFIRM MODAL */
+.confirm-overlay{display:none;position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px}
+.confirm-overlay.open{display:flex}
+.confirm-box{background:var(--surface);border-radius:20px;padding:32px 28px;width:100%;max-width:400px;box-shadow:var(--shadow-lg);animation:slideUp .3s ease;text-align:center}
+.confirm-icon{font-size:48px;margin-bottom:12px}
+.confirm-title{font-family:var(--font-head);font-size:20px;font-weight:800;margin-bottom:8px;color:var(--ink)}
+.confirm-desc{font-size:14px;color:var(--ink2);line-height:1.6;margin-bottom:24px}
+.confirm-btns{display:flex;flex-direction:column;gap:10px}
+.btn-confirm-wa{width:100%;padding:14px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-head);display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
+.btn-confirm-wa:hover{opacity:.9}
+.btn-confirm-cancel{width:100%;padding:12px;background:transparent;color:var(--ink3);border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;cursor:pointer;font-family:var(--font-body);transition:all .2s}
 .loading-text{font-family:var(--font-head);font-size:13px;color:var(--ink3);letter-spacing:2px}
 </style>
 </head>
@@ -262,6 +273,19 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--ink);transiti
 </div>
 
 <div class="toast-wrap" id="toast-wrap"></div>
+
+<!-- CONFIRM ENVIO -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-icon">📋</div>
+    <div class="confirm-title">Confirmar pedido</div>
+    <div class="confirm-desc">Se enviará el pedido por WhatsApp y se descargará automáticamente el archivo Excel.<br><br>📎 <strong>Recuerda adjuntar el Excel</strong> en el chat de WhatsApp para que tengamos el detalle completo.</div>
+    <div class="confirm-btns">
+      <button class="btn-confirm-wa" onclick="confirmarEnvio()">💬 Enviar por WhatsApp + Descargar Excel</button>
+      <button class="btn-confirm-cancel" onclick="document.getElementById('confirm-overlay').classList.remove('open')">Cancelar</button>
+    </div>
+  </div>
+</div>
 
 <script>
 const API='https://script.google.com/macros/s/AKfycbym_sDa3bxs-WPYza1QuNvPY4qwdODzAJ_h1iPZ8BfZgwRLEc7ctjpXzA8EB19WGtQ/exec';
@@ -721,7 +745,7 @@ function renderCart(){
       <span class="cart-total-label">Total (${totalQty} productos)</span>
       <span class="cart-total-val">${fmt(total)}</span>
     </div>
-    <button class="btn-checkout" onclick="sendWA()"><span style="font-size:20px">💬</span> Enviar pedido por WhatsApp</button>
+    <button class="btn-checkout" onclick="abrirConfirm()"><span style="font-size:20px">💬</span> Enviar pedido por WhatsApp</button>
     <button class="btn-excel" onclick="descargarExcel()">📥 Descargar Excel</button>
     <button class="btn-clear" onclick="clearCart()">Vaciar carrito</button>`;
 }
@@ -733,6 +757,20 @@ function clearCart(){
     call('clearCarrito',{usuario:SESSION.usuario}).catch(()=>{});
   }
   updateBadge();renderCart();
+}
+
+function abrirConfirm(){
+  if(!CARRITO.length) return;
+  cerrarCarrito();
+  setTimeout(()=>document.getElementById('confirm-overlay').classList.add('open'),300);
+}
+
+function confirmarEnvio(){
+  document.getElementById('confirm-overlay').classList.remove('open');
+  // Descargar Excel primero
+  descargarExcel();
+  // Enviar WhatsApp después de un momento
+  setTimeout(()=>sendWA(),600);
 }
 
 function sendWA(){
