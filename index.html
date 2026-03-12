@@ -649,7 +649,7 @@ function sendWA(){
   msg+=`📋 Lista: *${lista}*\n`;
   msg+=`─────────────────\n`;
   CARRITO.forEach(it=>{
-    const skuCat = it.sku_cat || it.sku;
+    const skuCat = it.sku_cat || it.sku.split('/')[0];
     const skuMod = it.sku_modelo ? ` / ${it.sku_modelo}` : '';
     msg+=`• *${it.nombre}*\n`;
     msg+=`  SKU: ${skuCat}${skuMod}  |  Cant: ${it.qty}  |  ${fmt(it.precio)} c/u\n`;
@@ -674,10 +674,10 @@ function descargarExcel(){
   csv+=`Cliente:,${cliente}${empresa?' ('+empresa+')':''}\n`;
   csv+=`Lista:,${lista}\n`;
   csv+=`Fecha:,${fecha}\n\n`;
-  csv+=`SKU Categoría,SKU Modelo,Nombre,Cantidad,Precio Unitario,Subtotal\n`;
+  csv+=`SKU Categoria,SKU Modelo,Nombre,Cantidad,Precio Unitario,Subtotal\n`;
   CARRITO.forEach(it=>{
-    const skuCat = it.sku_cat || it.sku;
-    const skuMod = it.sku_modelo || '—';
+    const skuCat = it.sku_cat || it.sku.split('/')[0];
+    const skuMod = it.sku_modelo || '';
     csv+=`${skuCat},${skuMod},"${it.nombre}",${it.qty},${it.precio.toFixed(2)},${(it.precio*it.qty).toFixed(2)}\n`;
   });
   csv+=`\n,,,,,\nTOTAL:,,,,,${total.toFixed(2)}\n`;
