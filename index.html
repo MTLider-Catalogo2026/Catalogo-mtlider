@@ -183,7 +183,42 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--ink);transiti
 .loading-screen.show{display:flex}
 .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-/* BIENVENIDA */
+.admin-tabs{display:flex;gap:4px;background:var(--surface2);border-radius:12px;padding:4px;margin-bottom:20px}
+.admin-tab{flex:1;padding:10px;border:none;background:transparent;border-radius:9px;font-family:var(--font-head);font-size:13px;font-weight:700;cursor:pointer;color:var(--ink3);transition:all .2s}
+.admin-tab.active{background:var(--surface);color:var(--primary);box-shadow:var(--shadow)}
+.admin-tab-content{display:none}.admin-tab-content.active{display:block}
+/* Clientes tabla */
+.clientes-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.btn-nuevo-cliente{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;border:none;border-radius:var(--radius-sm);padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-head);display:flex;align-items:center;gap:6px}
+.clientes-grid{display:flex;flex-direction:column;gap:10px}
+.cliente-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.cliente-info{flex:1;min-width:0}
+.cliente-nombre{font-family:var(--font-head);font-size:14px;font-weight:800;color:var(--ink)}
+.cliente-meta{font-size:12px;color:var(--ink3);margin-top:2px}
+.cliente-badges{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.badge-lista{background:rgba(0,102,204,.12);color:var(--primary);font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px}
+.badge-activo{background:rgba(0,200,83,.15);color:#00a854;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px}
+.badge-inactivo{background:rgba(255,59,48,.12);color:var(--red);font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px}
+.badge-rol{background:rgba(255,149,0,.15);color:#cc7700;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px}
+.cliente-actions{display:flex;gap:8px}
+.btn-editar{background:transparent;border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;color:var(--ink2);font-family:var(--font-head)}
+.btn-editar:hover{border-color:var(--primary);color:var(--primary)}
+/* Modal cliente */
+.modal-cliente-overlay{display:none;position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px;overflow-y:auto}
+.modal-cliente-overlay.open{display:flex}
+.modal-cliente-box{background:var(--surface);border-radius:20px;padding:28px 24px;width:100%;max-width:480px;box-shadow:var(--shadow-lg);animation:slideUp .3s ease;margin:auto}
+.modal-cliente-title{font-family:var(--font-head);font-size:18px;font-weight:900;margin-bottom:20px;color:var(--ink)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.form-group label{font-size:12px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px}
+.form-group input,.form-group select{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--ink);font-family:var(--font-body);outline:none;transition:border .2s}
+.form-group input:focus,.form-group select:focus{border-color:var(--primary)}
+.form-group select{cursor:pointer}
+.modal-cliente-btns{display:flex;gap:10px;margin-top:8px}
+.btn-guardar-cliente{flex:1;padding:13px;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-head)}
+.btn-cancelar-cliente{padding:13px 18px;background:transparent;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;cursor:pointer;color:var(--ink3);font-family:var(--font-body)}
+.form-error{color:var(--red);font-size:12px;margin-top:4px;min-height:16px}
+
 .bienvenida-overlay{display:none;position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:24px;animation:fadeIn .4s ease}
 .bienvenida-overlay.open{display:flex}
 .bienvenida-box{background:var(--surface);border-radius:24px;padding:36px 28px;width:100%;max-width:420px;text-align:center;box-shadow:var(--shadow-lg);animation:slideUp .4s ease}
@@ -251,7 +286,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--ink);transiti
     <div class="login-field"><label>Contraseña</label><input type="password" id="login-pass" placeholder="••••••••"></div>
     <div id="login-error" class="login-error"></div>
     <button class="btn-login" onclick="doLogin()">ENTRAR</button>
-    <button class="btn-guest" onclick="entrarInvitado()">👀 Ver como invitado </button>
+    <button class="btn-guest" onclick="entrarInvitado()">👀 Ver como invitado (precios mayoreo)</button>
   </div>
 </div>
 
@@ -328,23 +363,106 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--ink);transiti
     <div class="admin-topbar-left">
       <div>
         <div class="admin-topbar-title">📊 Panel Admin — MTLider</div>
-        <div class="admin-topbar-sub">Carritos activos de clientes</div>
+        <div class="admin-topbar-sub" id="admin-user"></div>
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:10px">
-      <span style="font-size:13px;color:var(--ink3)" id="admin-user"></span>
-      <button class="admin-refresh" onclick="cargarCarritosAdmin()">🔄 Actualizar</button>
+      <button class="admin-refresh" onclick="recargarAdminTab()">🔄 Actualizar</button>
       <button onclick="doLogout()" style="background:transparent;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:7px 14px;font-size:12px;cursor:pointer;color:var(--ink3)">Salir</button>
     </div>
   </div>
   <div class="admin-body">
-    <div class="admin-header">
-      <span class="admin-count" id="admin-count"></span>
+    <div class="admin-tabs">
+      <button class="admin-tab active" id="tab-carritos" onclick="switchAdminTab('carritos')">🛒 Carritos activos</button>
+      <button class="admin-tab" id="tab-clientes" onclick="switchAdminTab('clientes')">👥 Clientes</button>
     </div>
-    <div class="admin-loading" id="admin-loading">
-      <div class="spinner"></div> Cargando carritos...
+
+    <!-- TAB CARRITOS -->
+    <div class="admin-tab-content active" id="content-carritos">
+      <div class="admin-header">
+        <span class="admin-count" id="admin-count"></span>
+      </div>
+      <div class="admin-loading" id="admin-loading"><div class="spinner"></div> Cargando carritos...</div>
+      <div class="admin-grid" id="admin-grid"></div>
     </div>
-    <div class="admin-grid" id="admin-grid"></div>
+
+    <!-- TAB CLIENTES -->
+    <div class="admin-tab-content" id="content-clientes">
+      <div class="clientes-header">
+        <span class="admin-count" id="clientes-count"></span>
+        <button class="btn-nuevo-cliente" onclick="abrirModalCliente()">➕ Nuevo cliente</button>
+      </div>
+      <div class="admin-loading" id="clientes-loading"><div class="spinner"></div> Cargando clientes...</div>
+      <div class="clientes-grid" id="clientes-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CLIENTE -->
+<div class="modal-cliente-overlay" id="modal-cliente-overlay">
+  <div class="modal-cliente-box">
+    <div class="modal-cliente-title" id="modal-cliente-title">➕ Nuevo cliente</div>
+    <input type="hidden" id="cliente-fila" value="">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Usuario</label>
+        <input type="text" id="cli-usuario" placeholder="usuario123">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="text" id="cli-password" placeholder="contraseña">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nombre completo</label>
+        <input type="text" id="cli-nombre" placeholder="Juan Pérez">
+      </div>
+      <div class="form-group">
+        <label>Empresa</label>
+        <input type="text" id="cli-empresa" placeholder="Empresa S.A.">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Lista de precios</label>
+        <select id="cli-lista">
+          <option value="Mayoreo">Mayoreo</option>
+          <option value="Menudeo">Menudeo</option>
+          <option value="Distribuidor">Distribuidor</option>
+          <option value="VIP">VIP</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Rol</label>
+        <select id="cli-rol">
+          <option value="cliente">Cliente</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>WhatsApp vendedor</label>
+        <input type="text" id="cli-vendedor-wa" placeholder="523312345678">
+      </div>
+      <div class="form-group">
+        <label>Nombre vendedor</label>
+        <input type="text" id="cli-vendedor-nombre" placeholder="Carlos López">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Activo</label>
+      <select id="cli-activo">
+        <option value="SI">✅ SI</option>
+        <option value="NO">❌ NO</option>
+      </select>
+    </div>
+    <div class="form-error" id="modal-cliente-error"></div>
+    <div class="modal-cliente-btns">
+      <button class="btn-cancelar-cliente" onclick="cerrarModalCliente()">Cancelar</button>
+      <button class="btn-guardar-cliente" onclick="guardarCliente()">💾 Guardar cliente</button>
+    </div>
   </div>
 </div>
 
@@ -368,7 +486,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--ink);transiti
 </div>
 
 <script>
-const API='https://script.google.com/macros/s/AKfycbyajvGEt0TRWGddMh0mcufemwql8iT4IZ4Yp-qJQ_aExqzeFGCE1m5As-ivTqXrHSXd/exec';
+const API='https://script.google.com/macros/s/AKfycbxIyy5plLzwTAS7RtvbZoqDmSZtZhMXengPH8sgBDDn4cglJOVOVxU5HL0s6_mJm6RA/exec';
 
 let SESSION=null,CONFIG={},ALL_PRODS=[],ALL_CATS=[],ALL_VARIANTES=[],CARRITO=[],CAT='todas',Q='',DARK=false;
 
@@ -391,23 +509,25 @@ async function init(){
   // Si hay caché, mostrar app de inmediato
   if(cachedProds){
     document.getElementById('loading').classList.remove('show');
-    if(SESSION){cargarCarritoGuardado();mostrarApp();}
-    else document.getElementById('screen-login').classList.add('active');
+    if(SESSION){
+      if(SESSION.rol==='admin') mostrarAdmin();
+      else {cargarCarritoGuardado();mostrarApp();}
+    } else document.getElementById('screen-login').classList.add('active');
   }
 
   // Actualizar datos en segundo plano
   try{
     await Promise.all([loadConfig(),loadProds(),loadCats(),loadVariantes()]);
-    // Guardar en caché
     localStorage.setItem('cache_productos',JSON.stringify(ALL_PRODS));
     localStorage.setItem('cache_categorias',JSON.stringify(ALL_CATS));
     localStorage.setItem('cache_variantes',JSON.stringify(ALL_VARIANTES));
     localStorage.setItem('cache_config',JSON.stringify(CONFIG));
-    // Si no había caché, mostrar ahora
     if(!cachedProds){
       document.getElementById('loading').classList.remove('show');
-      if(SESSION){cargarCarritoGuardado();mostrarApp();}
-      else document.getElementById('screen-login').classList.add('active');
+      if(SESSION){
+        if(SESSION.rol==='admin') mostrarAdmin();
+        else {cargarCarritoGuardado();mostrarApp();}
+      } else document.getElementById('screen-login').classList.add('active');
     } else {
       // Refrescar grid silenciosamente si ya estaba visible
       if(SESSION){
@@ -521,13 +641,30 @@ async function mostrarAdmin(){
   document.getElementById('screen-login').classList.remove('active');
   document.getElementById('screen-login').classList.add('hidden');
   document.getElementById('screen-admin').classList.add('active');
-  document.getElementById('admin-user').textContent=SESSION.nombre;
+  document.getElementById('admin-user').textContent='👤 '+SESSION.nombre;
   await cargarCarritosAdmin();
+}
+
+let ADMIN_TAB='carritos';
+function switchAdminTab(tab){
+  ADMIN_TAB=tab;
+  document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.admin-tab-content').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.getElementById('content-'+tab).classList.add('active');
+  if(tab==='carritos') cargarCarritosAdmin();
+  else cargarClientesAdmin();
+}
+
+function recargarAdminTab(){
+  if(ADMIN_TAB==='carritos') cargarCarritosAdmin();
+  else cargarClientesAdmin();
 }
 
 async function cargarCarritosAdmin(){
   document.getElementById('admin-loading').style.display='flex';
   document.getElementById('admin-grid').innerHTML='';
+  document.getElementById('admin-count').textContent='';
   const r=await call('getCarritosAdmin');
   document.getElementById('admin-loading').style.display='none';
   if(!r.ok||!r.carritos.length){
@@ -549,7 +686,7 @@ async function cargarCarritosAdmin(){
       <div class="admin-card-header">
         <div>
           <div class="admin-card-nombre">👤 ${c.nombre}${c.empresa?' — '+c.empresa:''}</div>
-          <div class="admin-card-meta">📋 Lista: ${c.lista} ${c.vendedor?'| 👨‍💼 Vendedor: '+c.vendedor:''}</div>
+          <div class="admin-card-meta">📋 Lista: ${c.lista}${c.vendedor?' | 👨‍💼 '+c.vendedor:''}</div>
         </div>
         <div class="admin-card-total">${fmt2(c.total)}</div>
       </div>
@@ -562,7 +699,109 @@ async function cargarCarritosAdmin(){
   });
 }
 
+let ALL_CLIENTES=[];
+async function cargarClientesAdmin(){
+  document.getElementById('clientes-loading').style.display='flex';
+  document.getElementById('clientes-grid').innerHTML='';
+  document.getElementById('clientes-count').textContent='';
+  const r=await call('getClientes');
+  document.getElementById('clientes-loading').style.display='none';
+  if(!r.ok){document.getElementById('clientes-grid').innerHTML='<div class="admin-empty">❌ Error cargando clientes</div>';return;}
+  ALL_CLIENTES=r.clientes||[];
+  document.getElementById('clientes-count').textContent=ALL_CLIENTES.length+' cliente(s) registrado(s)';
+  if(!ALL_CLIENTES.length){document.getElementById('clientes-grid').innerHTML='<div class="admin-empty">👥 No hay clientes registrados</div>';return;}
+  ALL_CLIENTES.forEach(c=>{
+    const div=document.createElement('div');
+    div.className='cliente-card';
+    const actBadge=c.activo.toUpperCase()==='SI'?'<span class="badge-activo">✅ Activo</span>':'<span class="badge-inactivo">❌ Inactivo</span>';
+    const rolBadge=c.rol==='admin'?'<span class="badge-rol">⭐ Admin</span>':'';
+    div.innerHTML=`
+      <div class="cliente-info">
+        <div class="cliente-nombre">${c.nombre||c.usuario} ${c.empresa?'<span style="font-weight:400;color:var(--ink3)">— '+c.empresa+'</span>':''}</div>
+        <div class="cliente-meta">👤 ${c.usuario}${c.vendedor_nombre?' | 🧑‍💼 '+c.vendedor_nombre:''}</div>
+        <div class="cliente-badges">
+          <span class="badge-lista">📋 ${c.lista}</span>
+          ${actBadge}${rolBadge}
+        </div>
+      </div>
+      <div class="cliente-actions">
+        <button class="btn-editar" onclick='abrirModalEditar(${JSON.stringify(c)})'>✏️ Editar</button>
+      </div>`;
+    document.getElementById('clientes-grid').appendChild(div);
+  });
+}
+
+function abrirModalCliente(){
+  document.getElementById('modal-cliente-title').textContent='➕ Nuevo cliente';
+  document.getElementById('cliente-fila').value='';
+  document.getElementById('cli-usuario').value='';
+  document.getElementById('cli-usuario').disabled=false;
+  document.getElementById('cli-password').value='';
+  document.getElementById('cli-nombre').value='';
+  document.getElementById('cli-empresa').value='';
+  document.getElementById('cli-lista').value='Mayoreo';
+  document.getElementById('cli-rol').value='cliente';
+  document.getElementById('cli-vendedor-wa').value='';
+  document.getElementById('cli-vendedor-nombre').value='';
+  document.getElementById('cli-activo').value='SI';
+  document.getElementById('modal-cliente-error').textContent='';
+  document.getElementById('modal-cliente-overlay').classList.add('open');
+}
+
+function abrirModalEditar(c){
+  document.getElementById('modal-cliente-title').textContent='✏️ Editar cliente';
+  document.getElementById('cliente-fila').value=c.fila;
+  document.getElementById('cli-usuario').value=c.usuario;
+  document.getElementById('cli-usuario').disabled=true;
+  document.getElementById('cli-password').value=c.password;
+  document.getElementById('cli-nombre').value=c.nombre;
+  document.getElementById('cli-empresa').value=c.empresa;
+  document.getElementById('cli-lista').value=c.lista;
+  document.getElementById('cli-rol').value=c.rol||'cliente';
+  document.getElementById('cli-vendedor-wa').value=c.vendedor_wa;
+  document.getElementById('cli-vendedor-nombre').value=c.vendedor_nombre;
+  document.getElementById('cli-activo').value=c.activo.toUpperCase()==='SI'?'SI':'NO';
+  document.getElementById('modal-cliente-error').textContent='';
+  document.getElementById('modal-cliente-overlay').classList.add('open');
+}
+
+function cerrarModalCliente(){
+  document.getElementById('modal-cliente-overlay').classList.remove('open');
+}
+
+async function guardarCliente(){
+  const fila=document.getElementById('cliente-fila').value;
+  const usuario=document.getElementById('cli-usuario').value.trim();
+  const password=document.getElementById('cli-password').value.trim();
+  const nombre=document.getElementById('cli-nombre').value.trim();
+  const errEl=document.getElementById('modal-cliente-error');
+  if(!usuario||!password||!nombre){errEl.textContent='Usuario, contraseña y nombre son obligatorios';return;}
+  const params={
+    usuario, password, nombre,
+    empresa:          document.getElementById('cli-empresa').value.trim(),
+    lista:            document.getElementById('cli-lista').value,
+    vendedor_wa:      document.getElementById('cli-vendedor-wa').value.trim(),
+    vendedor_nombre:  document.getElementById('cli-vendedor-nombre').value.trim(),
+    activo:           document.getElementById('cli-activo').value,
+    rol:              document.getElementById('cli-rol').value
+  };
+  const btn=document.querySelector('.btn-guardar-cliente');
+  btn.textContent='Guardando...';btn.disabled=true;
+  const accion=fila?'editarCliente':'agregarCliente';
+  if(fila) params.fila=fila;
+  const r=await call(accion,params);
+  btn.textContent='💾 Guardar cliente';btn.disabled=false;
+  if(r.ok){
+    cerrarModalCliente();
+    toast('✅ Cliente '+(fila?'actualizado':'agregado')+' correctamente','success');
+    cargarClientesAdmin();
+  } else {
+    errEl.textContent=r.error||'Error al guardar';
+  }
+}
+
 function fmt2(n){return'$'+Number(n).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});}
+
 
 
 function getPrecio(p,precioEsp=null){
